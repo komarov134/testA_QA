@@ -52,4 +52,21 @@ public class Subscribers {
         room.addObject(new Object());
         assertThat("не пришли оповещения о каждом добавленном объекте", objects, hasSize(equalTo(2)));
     }
+
+    @Test
+    public void twoSubscribers() throws RoomClosedException {
+        final List<Object> firstListenerObjects = new LinkedList<>();
+        final List<Object> secondListenerObjects = new LinkedList<>();
+        IEventListener firstListener = firstListenerObjects::add;
+        IEventListener secondListener = secondListenerObjects::add;
+        room.open();
+        room.subscribe(firstListener);
+        room.subscribe(secondListener);
+        final Object objectToAdd = new Object();
+        room.addObject(objectToAdd);
+        assertThat("Должно быть одно уведомление у первого подписчика", firstListenerObjects, hasSize(equalTo(1)));
+        assertThat("Пришедший объект у первого подписчика не соответсвует ожидаемому", firstListenerObjects, hasItem(objectToAdd));
+        assertThat("Должно быть одно уведомление у второго подписчика", secondListenerObjects, hasSize(equalTo(1)));
+        assertThat("Пришедший у второго подписчика объект не соответсвует ожидаемому", secondListenerObjects, hasItem(objectToAdd));
+    }
 }
